@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/sync-matches?auto=1&mode=live",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/sync-matches?auto=1&mode=today",
+      "schedule": "0 */2 * * *"
+    }
+  ]
+}
