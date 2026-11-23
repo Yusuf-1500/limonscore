@@ -22,7 +22,7 @@ import {
   X,
   Home,
   User,
-  Volume2,
+  Volume2, Sun, Moon,
   VolumeX,
   Bell,
   LogIn,
@@ -146,6 +146,30 @@ export default function LimonScoreDashboard() {
   const [authEmailInput, setAuthEmailInput] = useState('');
   const [authMessage, setAuthMessage] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+
+    const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('limonscore_theme');
+    if (savedTheme === 'light') {
+      setIsLightMode(true);
+      document.documentElement.classList.add('light-theme');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsLightMode((prev) => {
+      const next = !prev;
+      if (next) {
+        document.documentElement.classList.add('light-theme');
+        localStorage.setItem('limonscore_theme', 'light');
+      } else {
+        document.documentElement.classList.remove('light-theme');
+        localStorage.setItem('limonscore_theme', 'dark');
+      }
+      return next;
+    });
+  };
 
   const selectedDateStr = useMemo(() => getDateOffsetStr(dayOffset), [dayOffset]);
 
