@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const dateParam = explicitDate || nowLocal.toISOString().split('T')[0];
 
     const cacheKey = mode === 'live' ? 'sync_live' : `sync_date_${dateParam}`;
-    const minIntervalSeconds = mode === 'live' ? 45 : 300;
+    const minIntervalSeconds = mode === 'live' ? 120 : 1800;
 
     if (!force) {
       const { data: syncLog } = await supabaseAdmin
@@ -73,6 +73,7 @@ export async function GET(request: Request) {
         ? `https://${host}/fixtures?live=all`
         : `https://${host}/fixtures?date=${dateParam}`;
 
+    await supabaseAdmin.from('sync_logs').upsert({ sync_key: cacheKey, last_synced_at: new Date().toISOString() });
     const res = await fetch(apiUrl, { headers, cache: 'no-store' });
     if (!res.ok) {
       throw new Error(`API-Football Hatasi: ${res.status}`);
