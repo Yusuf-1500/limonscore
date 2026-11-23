@@ -1,5 +1,5 @@
-import { AdBanner } from '@/components/AdBanner';
 'use client';
+import { AdBanner } from '@/components/AdBanner';
 import { useLanguage, LangSetting } from '@/context/LanguageContext';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -1389,7 +1389,6 @@ export default function LimonScoreDashboard() {
     
       {/* AdSense Uyumlu Bilgilendirme Ozeti & Yasal Alt Bilgi */}
       <footer className="max-w-[1440px] mx-auto px-4 pt-6 pb-10 mt-6 border-t border-slate-800/80 text-xs text-slate-400 space-y-4">
-        <AdBanner format="horizontal" className="mb-4" />
         <div className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 leading-relaxed text-slate-400">
           <h2 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-1">
             LimonScore — Canlı Futbol Skorları, Fikstür ve Maç Merkezi
@@ -1397,8 +1396,7 @@ export default function LimonScoreDashboard() {
           <p>
             LimonScore üzerinden Türkiye Süper Lig, İngiltere Premier League, İspanya La Liga, İtalya Serie A,
             Almanya Bundesliga ve dünya genelindeki 100&apos;den fazla ligin anlık canlı skorlarını, gol dakikalarını,
-            oyuncu değişikliklerini, maç istatistiklerini ve güncel puan durumlarını saniyesi saniyesine takip
-            edebilirsiniz.
+            oyuncu değişikliklerini, maç istatistiklerini ve güncel puan durumlarını takip edebilirsiniz.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
