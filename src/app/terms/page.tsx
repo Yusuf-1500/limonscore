@@ -15,30 +15,18 @@ export default function TermsPage() {
             ← Ana Sayfaya Dön
           </Link>
         </div>
-
         <section className="space-y-2 text-sm leading-relaxed text-slate-300">
           <h2 className="text-base font-bold text-white">1. Hizmet Kapsamı</h2>
           <p>
             LimonScore, dünya genelindeki futbol ligleri ve turnuvalarına ait canlı skorlar, maç olayları, kadrolar
-            ve puan durumlarını bilgilendirme amacıyla sunar. Sitedeki veriler yalnızca genel bilgi ve spor takibi
-            içindir.
+            ve puan durumlarını genel bilgilendirme amacıyla sunar.
           </p>
         </section>
-
         <section className="space-y-2 text-sm leading-relaxed text-slate-300">
           <h2 className="text-base font-bold text-white">2. Veri Doğruluğu ve Sorumluluk Reddi</h2>
           <p>
-            Canlı maç verileri uluslararası spor veri sağlayıcıları üzerinden anlık olarak senkronize edilir. Ağ
-            gecikmeleri veya yayıncı kaynaklı anlık farklılıklardan doğabilecek gecikmelerden LimonScore sorumlu
-            tutulamaz. Sitemiz bahis veya kumar hizmeti sunmaz.
-          </p>
-        </section>
-
-        <section className="space-y-2 text-sm leading-relaxed text-slate-300">
-          <h2 className="text-base font-bold text-white">3. Fikri Mülkiyet</h2>
-          <p>
-            Sitede yer alan takım ve lig logoları ilgili spor kulüpleri ve federasyonlarının mülkiyetindedir;
-            yalnızca tanımlama ve bilgilendirme amacıyla gösterilmektedir.
+            Canlı maç verileri uluslararası spor veri sağlayıcıları üzerinden senkronize edilir. Ağ gecikmelerinden
+            kaynaklanabilecek anlık farklılıklardan LimonScore sorumlu tutulamaz. Sitemiz bahis veya kumar hizmeti sunmaz.
           </p>
         </section>
       </div>

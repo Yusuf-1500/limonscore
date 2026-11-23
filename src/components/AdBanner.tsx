@@ -8,22 +8,18 @@ interface AdBannerProps {
   className?: string;
 }
 
-export function AdBanner({ slot = '0000000000', format = 'horizontal', className = '' }: AdBannerProps) {
-  const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
-
+export function AdBanner({ slot = '', format = 'horizontal', className = '' }: AdBannerProps) {
   useEffect(() => {
-    if (!clientId) return;
+    if (!slot) return;
     try {
       // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // AdSense henuz yuklenmediyse sessizce gec
     }
-  }, [clientId]);
+  }, [slot]);
 
-  if (!clientId) {
-    return null;
-  }
+  if (!slot) return null;
 
   return (
     <div
@@ -35,7 +31,7 @@ export function AdBanner({ slot = '0000000000', format = 'horizontal', className
       <ins
         className="adsbygoogle"
         style={{ display: 'block', width: '100%' }}
-        data-ad-client={clientId}
+        data-ad-client="ca-pub-7870310846929838"
         data-ad-slot={slot}
         data-ad-format="auto"
         data-full-width-responsive="true"

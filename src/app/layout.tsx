@@ -35,6 +35,11 @@ export default function RootLayout({
             crossOrigin="anonymous"
           />
         )}
+              <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7870310846929838"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
         <LanguageProvider>{children}</LanguageProvider>
