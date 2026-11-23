@@ -287,10 +287,14 @@ export default function LimonScoreDashboard() {
         away_team:teams!matches_away_team_id_fkey(id, name, short_name, logo_url),
         league:leagues!matches_league_id_fkey(id, name, country, logo_url)
       `)
-      .gte('fixture_date', new Date(new Date(selectedDateStr + 'T00:00:00Z').getTime() - 2 * 86400000).toISOString())
-      .lte('fixture_date', new Date(new Date(selectedDateStr + 'T23:59:59Z').getTime() + 2 * 86400000).toISOString())
+      .in('date_category', [
+        getDateOffsetStr(dayOffset - 1),
+        selectedDateStr,
+        getDateOffsetStr(dayOffset + 1),
+        'today',
+      ])
       .order('kickoff_time', { ascending: true })
-      .limit(2000);
+      .limit(1500);
 
     if (!error && data) {
       const typed = data as unknown as MatchItem[];
@@ -320,7 +324,7 @@ export default function LimonScoreDashboard() {
       setSelectedMatchId((prev) => prev ?? (typed[0]?.id || null));
     }
     setLoading(false);
-  }, [selectedDateStr, triggerGoalNotification]);
+  }, [dayOffset, selectedDateStr, triggerGoalNotification]);
 
   const triggerBackgroundSync = useCallback(
     async (mode: 'live' | 'date', dateStr?: string, force = false) => {
