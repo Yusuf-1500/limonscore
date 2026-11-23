@@ -3,8 +3,6 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export const runtime = 'edge';
 
-const TOP_LEAGUES = new Set([2, 3, 848, 203, 39, 140, 135, 78, 61, 71, 13, 269, 1]);
-
 function mapStatus(shortStatus: string): 'LIVE' | 'FT' | 'NS' | 'HT' {
   if (['1H', '2H', 'ET', 'BT', 'P', 'LIVE'].includes(shortStatus)) return 'LIVE';
   if (shortStatus === 'HT') return 'HT';
@@ -29,8 +27,12 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const mode = searchParams.get('mode') || 'live';
-    const dateParam = searchParams.get('date') || new Date().toISOString().split('T')[0];
+    const explicitDate = searchParams.get('date');
     const force = searchParams.get('force') === '1';
+
+    // Yerel saat farki (UTC+3 / UTC+5) nedeniyle bugunun tarihini dogru hesapla
+    const nowLocal = new Date(Date.now() + 3 * 3600 * 1000);
+    const dateParam = explicitDate || nowLocal.toISOString().split('T')[0];
 
     const cacheKey = mode === 'live' ? 'sync_live' : `sync_date_${dateParam}`;
     const minIntervalSeconds = mode === 'live' ? 45 : 300;
@@ -48,14 +50,14 @@ export async function GET(request: Request) {
           return NextResponse.json({
             ok: true,
             cached: true,
-            message: 'Önbellek güncel',
+            date: dateParam,
           });
         }
       }
     }
 
-    const host = process.env.API_FOOTBALL_HOST || 'v3.football.api-sports.io';
-    const apiKey = process.env.API_FOOTBALL_KEY!;
+    const host = (process.env.API_FOOTBALL_HOST || 'v3.football.api-sports.io').trim();
+    const apiKey = (process.env.API_FOOTBALL_KEY || '').trim();
 
     const headers: Record<string, string> = host.includes('rapidapi')
       ? {
@@ -73,7 +75,7 @@ export async function GET(request: Request) {
 
     const res = await fetch(apiUrl, { headers, cache: 'no-store' });
     if (!res.ok) {
-      throw new Error(`API-Football Hatası: ${res.status}`);
+      throw new Error(`API-Football Hatasi: ${res.status}`);
     }
 
     const json = await res.json();
@@ -118,12 +120,15 @@ export async function GET(request: Request) {
         logo_url: away.logo || null,
       });
 
-      const fixtureDateOnly = fix.date ? fix.date.split('T')[0] : dateParam;
+      // Istanbul saatine gore gun kategorisi
+      const localFixDate = fix.date
+        ? new Date(new Date(fix.date).getTime() + 3 * 3600 * 1000).toISOString().split('T')[0]
+        : dateParam;
 
       matchesList.push({
         id: `f-${fix.id}`,
         league_id: leagueId,
-        date_category: fixtureDateOnly,
+        date_category: localFixDate,
         fixture_date: fix.date || null,
         kickoff_time: formatKickoffTime(fix.date),
         status: mapStatus(fix.status?.short || 'NS'),
@@ -137,6 +142,11 @@ export async function GET(request: Request) {
         venue_name: fix.venue?.name || null,
         referee_name: fix.referee || null,
       });
+    }
+
+    // Ilk kurulumdaki sahte ornek maclari temizle (gercek maclar 'f-' ile baslar)
+    if (matchesList.length > 0) {
+      await supabaseAdmin.from('matches').delete().not('id', 'like', 'f-%');
     }
 
     if (leaguesMap.size > 0) {
@@ -159,11 +169,12 @@ export async function GET(request: Request) {
       synced: matchesList.length,
       mode,
       date: dateParam,
+      apiErrors: json.errors || [],
     });
   } catch (error: any) {
-    console.error('Sync hatası:', error);
+    console.error('Sync hatasi:', error);
     return NextResponse.json(
-      { ok: false, error: error?.message || 'Senkronizasyon hatası' },
+      { ok: false, error: error?.message || 'Senkronizasyon hatasi' },
       { status: 500 }
     );
   }
