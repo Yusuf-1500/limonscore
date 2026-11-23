@@ -146,7 +146,8 @@ export async function GET(request: Request) {
 
     // Ilk kurulumdaki sahte ornek maclari temizle (gercek maclar 'f-' ile baslar)
     if (matchesList.length > 0) {
-      await supabaseAdmin.from('matches').delete().not('id', 'like', 'f-%');
+      await supabaseAdmin.from('matches').delete().lt('fixture_date', '2026-11-20T00:00:00Z');
+      await supabaseAdmin.from('matches').delete().is('fixture_date', null);
     }
 
     if (leaguesMap.size > 0) {
