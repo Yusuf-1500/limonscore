@@ -371,13 +371,10 @@ export default function LimonScoreDashboard() {
   // Seçili tarihe ait maçlar
   const dateMatches = useMemo(() => {
     return matches.filter((m) => {
-      if (!m.fixture_date && !m.date_category) return dayOffset === 0;
-      if (m.fixture_date) {
-        const localDay = new Date(m.fixture_date).toLocaleDateString('en-CA');
-        const utcDay = m.fixture_date.split('T')[0];
-        return localDay === selectedDateStr || utcDay === selectedDateStr;
-      }
-      return dayOffset === 0 && m.date_category === 'today';
+      if (!m.fixture_date) return dayOffset === 0;
+      const utcDay = m.fixture_date.split('T')[0];
+      const localDay = new Date(m.fixture_date).toLocaleDateString('en-CA');
+      return utcDay === selectedDateStr || localDay === selectedDateStr;
     });
   }, [matches, selectedDateStr, dayOffset]);
 
