@@ -104,7 +104,7 @@ export async function GET(request: Request) {
         id: leagueId,
         name: league.name,
         country: league.country || 'World',
-        flag: country?.flag || '',
+        flag: league.flag || '',
         logo_url: league.logo || null,
       });
 
