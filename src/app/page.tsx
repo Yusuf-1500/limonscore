@@ -287,7 +287,10 @@ export default function LimonScoreDashboard() {
         away_team:teams!matches_away_team_id_fkey(id, name, short_name, logo_url),
         league:leagues!matches_league_id_fkey(id, name, country, logo_url)
       `)
-      .order('kickoff_time', { ascending: true });
+      .gte('fixture_date', new Date(new Date(selectedDateStr + 'T00:00:00Z').getTime() - 2 * 86400000).toISOString())
+      .lte('fixture_date', new Date(new Date(selectedDateStr + 'T23:59:59Z').getTime() + 2 * 86400000).toISOString())
+      .order('kickoff_time', { ascending: true })
+      .limit(2000);
 
     if (!error && data) {
       const typed = data as unknown as MatchItem[];
@@ -317,7 +320,7 @@ export default function LimonScoreDashboard() {
       setSelectedMatchId((prev) => prev ?? (typed[0]?.id || null));
     }
     setLoading(false);
-  }, [triggerGoalNotification]);
+  }, [selectedDateStr, triggerGoalNotification]);
 
   const triggerBackgroundSync = useCallback(
     async (mode: 'live' | 'date', dateStr?: string, force = false) => {
@@ -369,8 +372,12 @@ export default function LimonScoreDashboard() {
   const dateMatches = useMemo(() => {
     return matches.filter((m) => {
       if (!m.fixture_date && !m.date_category) return dayOffset === 0;
-      const mDay = m.fixture_date ? m.fixture_date.split('T')[0] : m.date_category;
-      return mDay === selectedDateStr || (dayOffset === 0 && m.date_category === 'today');
+      if (m.fixture_date) {
+        const localDay = new Date(m.fixture_date).toLocaleDateString('en-CA');
+        const utcDay = m.fixture_date.split('T')[0];
+        return localDay === selectedDateStr || utcDay === selectedDateStr;
+      }
+      return dayOffset === 0 && m.date_category === 'today';
     });
   }, [matches, selectedDateStr, dayOffset]);
 
