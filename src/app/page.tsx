@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage, LangSetting } from '@/context/LanguageContext';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase/client';
