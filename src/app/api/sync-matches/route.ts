@@ -104,6 +104,7 @@ export async function GET(request: Request) {
         id: leagueId,
         name: league.name,
         country: league.country || 'World',
+        flag: country?.flag || '',
         logo_url: league.logo || null,
       });
 
@@ -111,6 +112,7 @@ export async function GET(request: Request) {
         id: homeId,
         name: home.name,
         short_name: home.name.slice(0, 3).toUpperCase(),
+        country: league.country || 'World',
         logo_url: home.logo || null,
       });
 
@@ -118,18 +120,26 @@ export async function GET(request: Request) {
         id: awayId,
         name: away.name,
         short_name: away.name.slice(0, 3).toUpperCase(),
+        country: league.country || 'World',
         logo_url: away.logo || null,
       });
 
-      // Istanbul saatine gore gun kategorisi
+      // DB check constraint uyumlu kategori ('yesterday' | 'today' | 'tomorrow')
+      const nowIst = new Date(Date.now() + 3 * 3600 * 1000);
+      const todayStr = nowIst.toISOString().split('T')[0];
+      const yesterdayStr = new Date(nowIst.getTime() - 86400000).toISOString().split('T')[0];
+      const tomorrowStr = new Date(nowIst.getTime() + 86400000).toISOString().split('T')[0];
       const localFixDate = fix.date
         ? new Date(new Date(fix.date).getTime() + 3 * 3600 * 1000).toISOString().split('T')[0]
         : dateParam;
+      const dbCategory =
+        localFixDate === yesterdayStr ? 'yesterday' :
+        localFixDate === tomorrowStr ? 'tomorrow' : 'today';
 
       matchesList.push({
         id: `f-${fix.id}`,
         league_id: leagueId,
-        date_category: localFixDate,
+        date_category: dbCategory,
         fixture_date: fix.date || null,
         kickoff_time: formatKickoffTime(fix.date),
         status: mapStatus(fix.status?.short || 'NS'),
