@@ -89,7 +89,7 @@ function normalizeText(str: string): string {
 function getDateOffsetStr(offsetDays: number): string {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
-  return d.toISOString().split('T')[0];
+  return d.toLocaleDateString('en-CA');
 }
 
 function formatDateLabel(offsetDays: number, dateStr: string): string {
