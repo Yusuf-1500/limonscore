@@ -112,6 +112,7 @@ interface GoalAlertToast {
 
 export default function LimonScoreDashboard() {
   // Ana Navigasyon Sekmesi: Ana Sayfa | Favoriler | Arama | Profil
+  const { lang, setting: langSetting, setLangSetting, t } = useLanguage();
   const [navTab, setNavTab] = useState<'home' | 'favorites' | 'search' | 'profile'>('home');
 
   const [matches, setMatches] = useState<MatchItem[]>([]);
@@ -599,7 +600,7 @@ export default function LimonScoreDashboard() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Home className="w-3.5 h-3.5" /> Ana Sayfa
+              <Home className="w-3.5 h-3.5" /> {t('nav_home')}
             </button>
             <button
               onClick={() => setNavTab('favorites')}
@@ -609,7 +610,7 @@ export default function LimonScoreDashboard() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Star className="w-3.5 h-3.5" /> Favoriler
+              <Star className="w-3.5 h-3.5" /> {t('nav_favorites')}
               {totalFavoritesCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px]">
                   {totalFavoritesCount}
@@ -624,7 +625,7 @@ export default function LimonScoreDashboard() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Search className="w-3.5 h-3.5" /> Arama
+              <Search className="w-3.5 h-3.5" /> {t('nav_search')}
             </button>
             <button
               onClick={() => setNavTab('profile')}
@@ -634,7 +635,7 @@ export default function LimonScoreDashboard() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <User className="w-3.5 h-3.5" /> Profil
+              <User className="w-3.5 h-3.5" /> {t('nav_profile')}
             </button>
           </nav>
 
@@ -649,7 +650,7 @@ export default function LimonScoreDashboard() {
                 setSearchQuery(e.target.value);
                 if (navTab !== 'search') setNavTab('search');
               }}
-              placeholder="Takım, lig veya ülke ara..."
+              placeholder={t('search_placeholder')}
               className="w-full bg-slate-950 border border-slate-800 focus:border-lime-400/60 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none transition"
             />
             {searchQuery && (
@@ -697,7 +698,7 @@ export default function LimonScoreDashboard() {
         <aside className="hidden lg:flex lg:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden sticky top-20 max-h-[calc(100vh-5.5rem)] flex-col">
           <div className="p-3.5 border-b border-slate-800 flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Trophy className="w-3.5 h-3.5 text-lime-400" /> Ligler &amp; Turnuvalar
+              <Trophy className="w-3.5 h-3.5 text-lime-400" /> {t('leagues_title')}
             </span>
             <span className="text-[11px] font-semibold text-slate-500">
               {popularLeagues.length + otherLeagues.length}
@@ -716,7 +717,7 @@ export default function LimonScoreDashboard() {
                   : 'text-slate-300 hover:bg-slate-800/60'
               }`}
             >
-              <span>Tüm Ligler</span>
+              <span>{t('all_leagues')}</span>
               <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
                 {dateMatches.length}
               </span>
@@ -725,7 +726,7 @@ export default function LimonScoreDashboard() {
             {popularLeagues.length > 0 && (
               <div className="pt-2 pb-1">
                 <div className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-400/90 flex items-center gap-1">
-                  <Pin className="w-3 h-3" /> Popüler Ligler
+                  <Pin className="w-3 h-3" /> {t('popular_leagues')}
                 </div>
                 <div className="space-y-1">
                   {popularLeagues.map(({ league, count, liveCount }) => (
@@ -847,7 +848,7 @@ export default function LimonScoreDashboard() {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Biten
+                  <CheckCircle2 className="w-3.5 h-3.5" /> {t('filter_ft')}
                 </button>
                 <button
                   onClick={() => setStatusFilter('NS')}
@@ -901,7 +902,7 @@ export default function LimonScoreDashboard() {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> Favorilerim
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> {t('my_favorites')}
                 </h2>
                 <button
                   onClick={toggleSound}
@@ -999,10 +1000,10 @@ export default function LimonScoreDashboard() {
                   </div>
                   <div>
                     <h2 className="text-sm font-bold text-white">
-                      {userEmail ? userEmail : 'LimonScore Taraftar Profili'}
+                      {userEmail ? userEmail : t('profile_title')}
                     </h2>
                     <p className="text-xs text-slate-400">
-                      {userEmail ? 'limonscore.com Hesabı Bağlı' : 'Yerel cihaz tercihleri aktif'}
+                      {userEmail ? t('profile_account_linked') : t('profile_local_active')}
                     </p>
                   </div>
                 </div>
@@ -1010,28 +1011,28 @@ export default function LimonScoreDashboard() {
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-slate-950 border border-slate-800 rounded-xl p-3">
                     <div className="text-lg font-black font-mono text-amber-400">{favoriteMatches.length}</div>
-                    <div className="text-[11px] text-slate-400">Favori Maç</div>
+                    <div className="text-[11px] text-slate-400">{t('stat_fav_matches')}</div>
                   </div>
                   <div className="bg-slate-950 border border-slate-800 rounded-xl p-3">
                     <div className="text-lg font-black font-mono text-lime-400">{favoriteTeams.length}</div>
-                    <div className="text-[11px] text-slate-400">Favori Takım</div>
+                    <div className="text-[11px] text-slate-400">{t('stat_fav_teams')}</div>
                   </div>
                   <div className="bg-slate-950 border border-slate-800 rounded-xl p-3">
                     <div className="text-lg font-black font-mono text-sky-400">{liveTotalCount}</div>
-                    <div className="text-[11px] text-slate-400">Canlı Maç</div>
+                    <div className="text-[11px] text-slate-400">{t('stat_live_matches')}</div>
                   </div>
                 </div>
               </div>
 
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Bell className="w-3.5 h-3.5 text-lime-400" /> Canlı Gol Bildirimi Ayarları
+                  <Bell className="w-3.5 h-3.5 text-lime-400" /> {t('notif_settings_title')}
                 </h3>
 
                 <div className="flex items-center justify-between py-2 border-b border-slate-800/70">
                   <div>
-                    <div className="text-xs font-semibold text-white">Sesli Gol Uyarısı</div>
-                    <div className="text-[11px] text-slate-400">Gol olduğunda bildirim sesi çalar</div>
+                    <div className="text-xs font-semibold text-white">{t('sound_alert')}</div>
+                    <div className="text-[11px] text-slate-400">{t('sound_alert_desc')}</div>
                   </div>
                   <button
                     onClick={toggleSound}
@@ -1045,8 +1046,8 @@ export default function LimonScoreDashboard() {
 
                 <div className="flex items-center justify-between py-2 border-b border-slate-800/70">
                   <div>
-                    <div className="text-xs font-semibold text-white">Sadece Favoriler İçin Bildirim</div>
-                    <div className="text-[11px] text-slate-400">Yalnızca yıldızlı maç/takım gollerinde uyar</div>
+                    <div className="text-xs font-semibold text-white">{t('only_fav_alert')}</div>
+                    <div className="text-[11px] text-slate-400">{t('only_fav_alert_desc')}</div>
                   </div>
                   <button
                     onClick={toggleOnlyFavAlerts}
@@ -1125,7 +1126,7 @@ export default function LimonScoreDashboard() {
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
                     {navTab === 'favorites'
-                      ? 'Maçların solundaki yıldız ikonuna dokunarak favorilerinize ekleyebilirsiniz.'
+                      ? t('no_favorites_hint')
                       : 'Farklı bir gün veya sekme seçerek tekrar deneyebilirsiniz.'}
                   </p>
                 </div>
@@ -1286,7 +1287,7 @@ export default function LimonScoreDashboard() {
             }`}
           >
             <Home className="w-4 h-4" />
-            <span>Ana Sayfa</span>
+            <span>{t('nav_home')}</span>
           </button>
 
           <button
@@ -1306,7 +1307,7 @@ export default function LimonScoreDashboard() {
                 </span>
               )}
             </div>
-            <span>Favoriler</span>
+            <span>{t('nav_favorites')}</span>
           </button>
 
           <button
@@ -1319,7 +1320,7 @@ export default function LimonScoreDashboard() {
             }`}
           >
             <Search className="w-4 h-4" />
-            <span>Arama</span>
+            <span>{t('nav_search')}</span>
           </button>
 
           <button
@@ -1332,7 +1333,7 @@ export default function LimonScoreDashboard() {
             }`}
           >
             <User className="w-4 h-4" />
-            <span>Profil</span>
+            <span>{t('nav_profile')}</span>
           </button>
         </div>
       </nav>

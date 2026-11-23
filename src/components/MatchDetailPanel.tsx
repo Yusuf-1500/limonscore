@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 import { MatchItem, FixtureDetailsResponse } from '@/types/football';
 import { PitchView } from './PitchView';
 import {
@@ -35,6 +36,7 @@ export function MatchDetailPanel({
   favoriteTeams,
   onToggleFavoriteTeam,
 }: MatchDetailPanelProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'events' | 'stats' | 'lineups' | 'standings' | 'h2h'>('events');
   const [details, setDetails] = useState<FixtureDetailsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -115,9 +117,9 @@ export function MatchDetailPanel({
         <div className="w-12 h-12 rounded-full bg-lime-400/10 border border-lime-400/20 flex items-center justify-center mb-3 text-xl">
           🍋
         </div>
-        <h3 className="font-semibold text-slate-200">LimonScore Maç Merkezi</h3>
+        <h3 className="font-semibold text-slate-200">{t('panel_welcome_title')}</h3>
         <p className="text-xs text-slate-400 mt-1 max-w-xs">
-          Canlı olayları, istatistikleri, tıklanabilir 2D dizilişi, lig puan tablosunu ve H2H geçmişini incelemek için listeden bir maç seçin.
+          {t('panel_welcome_desc')}
         </p>
       </div>
     );
@@ -134,7 +136,7 @@ export function MatchDetailPanel({
           onClick={onClose}
           className="lg:hidden absolute top-3 left-3 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1 transition"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Geri
+          <ArrowLeft className="w-3.5 h-3.5" /> {t('btn_back')}
         </button>
 
         {/* Paylaşım & Tam Sayfa Linki */}
@@ -275,7 +277,7 @@ export function MatchDetailPanel({
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <ListOrdered className="w-3.5 h-3.5" /> <span>Olaylar</span>
+          <ListOrdered className="w-3.5 h-3.5" /> <span>{t('tab_events')}</span>
         </button>
         <button
           onClick={() => setActiveTab('stats')}
@@ -285,7 +287,7 @@ export function MatchDetailPanel({
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <BarChart2 className="w-3.5 h-3.5" /> <span>İstat.</span>
+          <BarChart2 className="w-3.5 h-3.5" /> <span>{t('tab_stats')}</span>
         </button>
         <button
           onClick={() => setActiveTab('lineups')}
@@ -295,7 +297,7 @@ export function MatchDetailPanel({
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Users className="w-3.5 h-3.5" /> <span>2D Saha</span>
+          <Users className="w-3.5 h-3.5" /> <span>{t('tab_lineups')}</span>
         </button>
         <button
           onClick={() => setActiveTab('standings')}
@@ -305,7 +307,7 @@ export function MatchDetailPanel({
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Trophy className="w-3.5 h-3.5" /> <span>Puan</span>
+          <Trophy className="w-3.5 h-3.5" /> <span>{t('tab_standings')}</span>
         </button>
         <button
           onClick={() => setActiveTab('h2h')}
@@ -315,7 +317,7 @@ export function MatchDetailPanel({
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <History className="w-3.5 h-3.5" /> <span>H2H</span>
+          <History className="w-3.5 h-3.5" /> <span>{t('tab_h2h')}</span>
         </button>
       </div>
 
@@ -324,12 +326,12 @@ export function MatchDetailPanel({
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-xs gap-2">
             <RefreshCw className="w-5 h-5 animate-spin text-lime-400" />
-            Maç verileri yükleniyor...
+            {t('loading_match')}
           </div>
         ) : activeTab === 'events' ? (
           !details?.events || details.events.length === 0 ? (
             <div className="text-center py-10 text-xs text-slate-400">
-              Henüz kaydedilmiş gol, kart veya oyuncu değişikliği bulunmuyor.
+              {t('no_events')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -416,7 +418,7 @@ export function MatchDetailPanel({
         ) : activeTab === 'standings' ? (
           !Array.isArray(details?.standings) || details.standings.length === 0 ? (
             <div className="text-center py-10 text-xs text-slate-400">
-              Bu turnuva/kupa karşılaşması için lig puan tablosu bulunmuyor.
+              {t('no_standings')}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -424,7 +426,7 @@ export function MatchDetailPanel({
                 <thead>
                   <tr className="text-[11px] text-slate-400 border-b border-slate-800">
                     <th className="py-2 pr-2">#</th>
-                    <th className="py-2">Takım</th>
+                    <th className="py-2">{t('col_team')}</th>
                     <th className="py-2 text-center">O</th>
                     <th className="py-2 text-center">G</th>
                     <th className="py-2 text-center">B</th>
@@ -467,7 +469,7 @@ export function MatchDetailPanel({
           )
         ) : !details?.h2h || details.h2h.length === 0 ? (
           <div className="text-center py-10 text-xs text-slate-400">
-            İki takım arasında kayıtlı geçmiş karşılaşma bulunamadı.
+            {t('no_h2h')}
           </div>
         ) : (
           <div className="space-y-2">
