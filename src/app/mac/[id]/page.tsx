@@ -93,7 +93,8 @@ export default async function SingleMatchPage({ params }: PageProps) {
   const events = cache?.events ?? [];
   const statistics = cache?.statistics ?? [];
   const lineups = cache?.lineups ?? [];
-  const standings = cache?.standings ?? [];
+  const rawStandings = Array.isArray(cache?.standings) ? cache.standings : [];
+  const standings = (Array.isArray(rawStandings[0]) ? rawStandings[0] : rawStandings).filter((r: any) => r && r.team);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12">
@@ -247,7 +248,7 @@ export default async function SingleMatchPage({ params }: PageProps) {
                         <img src={row.team.logo} alt="" className="w-4 h-4 object-contain" />
                         <span>{row.team.name}</span>
                       </td>
-                      <td className="py-2 text-center font-mono">{row.all.played}</td>
+                      <td className="py-2 text-center font-mono">{row.all?.played ?? '-'}</td>
                       <td className="py-2 text-center font-mono">{row.goalsDiff}</td>
                       <td className="py-2 text-right font-mono font-bold text-lime-400">{row.points}</td>
                     </tr>

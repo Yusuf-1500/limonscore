@@ -67,7 +67,9 @@ export function MatchDetailPanel({
   useEffect(() => {
     if (!match || !details) return;
     if (activeTab !== 'standings' && activeTab !== 'h2h') return;
-    if (details.standings.length > 0 || details.h2h.length > 0) return;
+    const hasStandings = Array.isArray(details?.standings) && details.standings.length > 0;
+    const hasH2h = Array.isArray(details?.h2h) && details.h2h.length > 0;
+    if (hasStandings || hasH2h) return;
 
     let cancelled = false;
     setLoading(true);
@@ -412,7 +414,7 @@ export function MatchDetailPanel({
             playersStats={details?.players ?? []}
           />
         ) : activeTab === 'standings' ? (
-          !details?.standings || details.standings.length === 0 ? (
+          !Array.isArray(details?.standings) || details.standings.length === 0 ? (
             <div className="text-center py-10 text-xs text-slate-400">
               Bu turnuva/kupa karşılaşması için lig puan tablosu bulunmuyor.
             </div>
@@ -432,7 +434,7 @@ export function MatchDetailPanel({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
-                  {details.standings.map((row) => {
+                  {(Array.isArray(details.standings[0]) ? details.standings[0] : details.standings).filter((r: any) => r && r.team).map((row: any) => {
                     const isMatchTeam =
                       `t-${row.team.id}` === match.home_team_id ||
                       `t-${row.team.id}` === match.away_team_id;
@@ -450,10 +452,10 @@ export function MatchDetailPanel({
                           <img src={row.team.logo} alt={row.team.name} className="w-4 h-4 object-contain shrink-0" />
                           <span className="truncate">{row.team.name}</span>
                         </td>
-                        <td className="py-2 text-center font-mono">{row.all.played}</td>
-                        <td className="py-2 text-center font-mono text-lime-400">{row.all.win}</td>
-                        <td className="py-2 text-center font-mono">{row.all.draw}</td>
-                        <td className="py-2 text-center font-mono text-rose-400">{row.all.lose}</td>
+                        <td className="py-2 text-center font-mono">{row.all?.played ?? '-'}</td>
+                        <td className="py-2 text-center font-mono text-lime-400">{row.all?.win ?? '-'}</td>
+                        <td className="py-2 text-center font-mono">{row.all?.draw ?? '-'}</td>
+                        <td className="py-2 text-center font-mono text-rose-400">{row.all?.lose ?? '-'}</td>
                         <td className="py-2 text-center font-mono">{row.goalsDiff}</td>
                         <td className="py-2 text-right font-mono font-bold text-lime-400">{row.points}</td>
                       </tr>
