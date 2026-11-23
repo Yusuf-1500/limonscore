@@ -287,10 +287,10 @@ export default function LimonScoreDashboard() {
         away_team:teams!matches_away_team_id_fkey(id, name, short_name, logo_url),
         league:leagues!matches_league_id_fkey(id, name, country, logo_url)
       `)
-      .gte('fixture_date', new Date(new Date(selectedDateStr + 'T00:00:00Z').getTime() - 2 * 86400000).toISOString())
-      .lte('fixture_date', new Date(new Date(selectedDateStr + 'T23:59:59Z').getTime() + 2 * 86400000).toISOString())
+      .gte('fixture_date', new Date(new Date(selectedDateStr + 'T00:00:00Z').getTime() - 18 * 3600000).toISOString())
+      .lte('fixture_date', new Date(new Date(selectedDateStr + 'T23:59:59Z').getTime() + 18 * 3600000).toISOString())
       .order('kickoff_time', { ascending: true })
-      .limit(1500);
+      .limit(600);
 
     if (!error && data) {
       const typed = data as unknown as MatchItem[];
@@ -561,7 +561,7 @@ export default function LimonScoreDashboard() {
               </div>
               <div className="flex items-center gap-2.5">
                 {toast.scorerTeamLogo && (
-                  <img src={toast.scorerTeamLogo} alt="" className="w-7 h-7 object-contain shrink-0" />
+                  <img loading="lazy" decoding="async" src={toast.scorerTeamLogo} alt="" className="w-7 h-7 object-contain shrink-0" />
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold text-white truncate">{toast.scorerTeamName}</div>
@@ -750,7 +750,7 @@ export default function LimonScoreDashboard() {
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {league.logo_url ? (
-                          <img src={league.logo_url} alt={league.name} className="w-4 h-4 object-contain shrink-0" />
+                          <img loading="lazy" decoding="async" src={league.logo_url} alt={league.name} className="w-4 h-4 object-contain shrink-0" />
                         ) : (
                           <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         )}
@@ -795,7 +795,7 @@ export default function LimonScoreDashboard() {
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {league.logo_url ? (
-                          <img src={league.logo_url} alt={league.name} className="w-4 h-4 object-contain shrink-0" />
+                          <img loading="lazy" decoding="async" src={league.logo_url} alt={league.name} className="w-4 h-4 object-contain shrink-0" />
                         ) : (
                           <Trophy className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                         )}
@@ -928,7 +928,7 @@ export default function LimonScoreDashboard() {
                         key={team.id}
                         className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs"
                       >
-                        {team.logo_url && <img src={team.logo_url} alt="" className="w-4 h-4 object-contain" />}
+                        {team.logo_url && <img loading="lazy" decoding="async" src={team.logo_url} alt="" className="w-4 h-4 object-contain" />}
                         <span className="font-semibold text-slate-200">{team.name}</span>
                         <button
                           onClick={() => toggleFavoriteTeam(team.id)}
@@ -981,7 +981,7 @@ export default function LimonScoreDashboard() {
                         className="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-lime-400/40 flex flex-col items-center text-center gap-1.5 transition"
                       >
                         {league.logo_url ? (
-                          <img src={league.logo_url} alt={league.name} className="w-7 h-7 object-contain" />
+                          <img loading="lazy" decoding="async" src={league.logo_url} alt={league.name} className="w-7 h-7 object-contain" />
                         ) : (
                           <Trophy className="w-6 h-6 text-amber-400" />
                         )}
