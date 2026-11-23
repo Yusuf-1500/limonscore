@@ -150,14 +150,18 @@ export async function GET(request: Request) {
       await supabaseAdmin.from('matches').delete().in('date_category', ['today', 'yesterday', 'tomorrow']);
     }
 
+    const dbErrors: Record<string, string> = {};
     if (leaguesMap.size > 0) {
-      await supabaseAdmin.from('leagues').upsert(Array.from(leaguesMap.values()));
+      const { error: lErr } = await supabaseAdmin.from('leagues').upsert(Array.from(leaguesMap.values()));
+      if (lErr) dbErrors.leagues = lErr.message;
     }
     if (teamsMap.size > 0) {
-      await supabaseAdmin.from('teams').upsert(Array.from(teamsMap.values()));
+      const { error: tErr } = await supabaseAdmin.from('teams').upsert(Array.from(teamsMap.values()));
+      if (tErr) dbErrors.teams = tErr.message;
     }
     if (matchesList.length > 0) {
-      await supabaseAdmin.from('matches').upsert(matchesList);
+      const { error: mErr } = await supabaseAdmin.from('matches').upsert(matchesList);
+      if (mErr) dbErrors.matches = mErr.message;
     }
 
     await supabaseAdmin.from('sync_logs').upsert({
@@ -171,6 +175,7 @@ export async function GET(request: Request) {
       mode,
       date: dateParam,
       apiErrors: json.errors || [],
+      dbErrors,
     });
   } catch (error: any) {
     console.error('Sync hatasi:', error);
