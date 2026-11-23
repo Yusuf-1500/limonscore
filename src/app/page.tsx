@@ -1,3 +1,4 @@
+import { AdBanner } from '@/components/AdBanner';
 'use client';
 import { useLanguage, LangSetting } from '@/context/LanguageContext';
 
@@ -1385,6 +1386,30 @@ export default function LimonScoreDashboard() {
           />
         </div>
       )}
+    
+      {/* AdSense Uyumlu Bilgilendirme Ozeti & Yasal Alt Bilgi */}
+      <footer className="max-w-[1440px] mx-auto px-4 pt-6 pb-10 mt-6 border-t border-slate-800/80 text-xs text-slate-400 space-y-4">
+        <AdBanner format="horizontal" className="mb-4" />
+        <div className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 leading-relaxed text-slate-400">
+          <h2 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-1">
+            LimonScore — Canlı Futbol Skorları, Fikstür ve Maç Merkezi
+          </h2>
+          <p>
+            LimonScore üzerinden Türkiye Süper Lig, İngiltere Premier League, İspanya La Liga, İtalya Serie A,
+            Almanya Bundesliga ve dünya genelindeki 100&apos;den fazla ligin anlık canlı skorlarını, gol dakikalarını,
+            oyuncu değişikliklerini, maç istatistiklerini ve güncel puan durumlarını saniyesi saniyesine takip
+            edebilirsiniz.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+          <span>© {new Date().getFullYear()} LimonScore. Tüm hakları saklıdır.</span>
+          <nav className="flex items-center gap-5 font-medium text-slate-300">
+            <a href="/privacy" className="hover:text-lime-400 transition">Gizlilik Politikası</a>
+            <a href="/terms" className="hover:text-lime-400 transition">Kullanım Koşulları</a>
+            <a href="/contact" className="hover:text-lime-400 transition">İletişim</a>
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }

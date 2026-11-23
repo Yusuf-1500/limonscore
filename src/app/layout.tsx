@@ -27,6 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className="dark">
+      <head>
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+          />
+        )}
+      </head>
       <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>
         <LanguageProvider>{children}</LanguageProvider>
       </body>
