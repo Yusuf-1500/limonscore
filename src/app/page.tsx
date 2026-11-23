@@ -144,6 +144,8 @@ export default function LimonScoreDashboard() {
   // Supabase Auth State (Profil sekmesi için)
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [authEmailInput, setAuthEmailInput] = useState('');
+  const [authPasswordInput, setAuthPasswordInput] = useState('');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [authMessage, setAuthMessage] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -519,20 +521,73 @@ export default function LimonScoreDashboard() {
     [matches, selectedMatchId]
   );
 
-  // Supabase Magic Link Girişi (noreply@limonscore.com üzerinden gönderilir)
-  const handleSendMagicLink = async (e: React.FormEvent) => {
+  // E-posta & Sifre ile Giris veya Kayit Ol
+  const handleEmailPasswordAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authEmailInput.trim()) return;
+    if (!authEmailInput.trim() || !authPasswordInput.trim()) return;
     setAuthLoading(true);
     setAuthMessage('');
-    const { error } = await supabase.auth.signInWithOtp({
-      email: authEmailInput.trim(),
+
+    if (authMode === 'register') {
+      const { data, error } = await supabase.auth.signUp({
+        email: authEmailInput.trim(),
+        password: authPasswordInput,
+      });
+      setAuthLoading(false);
+      if (error) {
+        setAuthMessage(`Hata: ${error.message}`);
+      } else if (data.user?.email && data.session) {
+        setUserEmail(data.user.email);
+        setAuthPasswordInput('');
+      } else {
+        setAuthMessage('Hesabınız oluşturuldu! E-posta adresinize gelen onay bağlantısına tıklayarak giriş yapabilirsiniz.');
+      }
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: authEmailInput.trim(),
+        password: authPasswordInput,
+      });
+      setAuthLoading(false);
+      if (error) {
+        setAuthMessage(`Hata: ${error.message}`);
+      } else if (data.user?.email) {
+        setUserEmail(data.user.email);
+        setAuthPasswordInput('');
+      }
+    }
+  };
+
+  // Google ile Oturum Acma
+  const handleGoogleLogin = async () => {
+    setAuthLoading(true);
+    setAuthMessage('');
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    });
+    setAuthLoading(false);
+    if (error) {
+      setAuthMessage(`Google Giriş Hatası: ${error.message}`);
+    }
+  };
+
+  // Sifremi Unuttum
+  const handleResetPassword = async () => {
+    if (!authEmailInput.trim()) {
+      setAuthMessage('Şifre sıfırlama bağlantısı için önce e-posta adresinizi yazın.');
+      return;
+    }
+    setAuthLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(authEmailInput.trim(), {
+      redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
     });
     setAuthLoading(false);
     if (error) {
       setAuthMessage(`Hata: ${error.message}`);
     } else {
-      setAuthMessage('Giriş bağlantısı e-posta adresinize gönderildi! Gelen kutunuzu kontrol edin.');
+      setAuthMessage('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
     }
   };
 
@@ -1148,30 +1203,100 @@ export default function LimonScoreDashboard() {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSendMagicLink} className="space-y-2.5">
-                    <p className="text-[11px] text-slate-400">
-                      E-posta adresinize <span className="text-slate-200 font-medium">noreply@limonscore.com</span> üzerinden tek tıkla giriş bağlantısı gönderilir.
-                    </p>
-                    <div className="flex gap-2">
+                  <div className="space-y-3">
+                    {/* Google ile Giris Butonu */}
+                    <button
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={authLoading}
+                      className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-2.5 transition shadow-sm"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                        <path fill="#34A853" d="M12 24c3.3 0 6.08-1.09 8.1-2.96l-3.88-3.05c-1.1.74-2.51 1.18-4.22 1.18-3.25 0-6-2.19-6.98-5.14H1.01v3.14C3.05 21.2 7.24 24 12 24Z"/>
+                        <path fill="#FBBC05" d="M5.02 14.03c-.25-.74-.39-1.54-.39-2.36 0-.82.14-1.62.39-2.36V6.17H1.01C.37 7.45 0 8.89 0 10.42s.37 2.97 1.01 4.25l4.01-3.14Z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.79 0 3.41.62 4.68 1.82l3.51-3.51C18.07 1.19 15.3 0 12 0 7.24 0 3.05 2.8 1.01 6.83l4.01 3.14c.98-2.95 3.73-5.22 6.98-5.22Z"/>
+                      </svg>
+                      Google ile Devam Et
+                    </button>
+
+                    <div className="relative flex items-center py-1">
+                      <div className="flex-grow border-t border-slate-800"></div>
+                      <span className="shrink mx-3 text-[10px] uppercase tracking-wider text-slate-500">veya e-posta ile</span>
+                      <div className="flex-grow border-t border-slate-800"></div>
+                    </div>
+
+                    {/* Giris Yap / Kayit Ol Sekmeleri */}
+                    <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-slate-950 border border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('login'); setAuthMessage(''); }}
+                        className={`py-1.5 rounded-lg text-xs font-bold transition ${
+                          authMode === 'login' ? 'bg-lime-400 text-slate-950' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Giriş Yap
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode('register'); setAuthMessage(''); }}
+                        className={`py-1.5 rounded-lg text-xs font-bold transition ${
+                          authMode === 'register' ? 'bg-lime-400 text-slate-950' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Kayıt Ol
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleEmailPasswordAuth} className="space-y-2.5">
                       <input
                         type="email"
                         required
                         value={authEmailInput}
                         onChange={(e) => setAuthEmailInput(e.target.value)}
-                        placeholder="ornek@email.com"
-                        className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-lime-400"
+                        placeholder="E-posta adresiniz (ornek@email.com)"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-lime-400"
                       />
-                      <button
-                        type="submit"
-                        disabled={authLoading}
-                        className="px-4 py-2 rounded-xl bg-lime-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shrink-0"
-                      >
-                        <LogIn className="w-3.5 h-3.5" />
-                        {authLoading ? 'Gönderiliyor...' : 'Giriş Linki'}
-                      </button>
-                    </div>
-                    {authMessage && <p className="text-xs text-lime-400">{authMessage}</p>}
-                  </form>
+                      <input
+                        type="password"
+                        required
+                        minLength={6}
+                        value={authPasswordInput}
+                        onChange={(e) => setAuthPasswordInput(e.target.value)}
+                        placeholder={authMode === 'register' ? 'Şifre oluşturun (en az 6 karakter)' : 'Şifreniz'}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-lime-400"
+                      />
+
+                      <div className="flex items-center justify-between pt-0.5">
+                        {authMode === 'login' ? (
+                          <button
+                            type="button"
+                            onClick={handleResetPassword}
+                            className="text-[11px] text-slate-400 hover:text-lime-400 transition"
+                          >
+                            Şifremi Unuttum
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-slate-500">En az 6 karakter</span>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={authLoading}
+                          className="px-5 py-2.5 rounded-xl bg-lime-400 hover:bg-lime-300 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition"
+                        >
+                          <LogIn className="w-3.5 h-3.5" />
+                          {authLoading ? 'İşleniyor...' : authMode === 'register' ? 'Hesap Oluştur' : 'Giriş Yap'}
+                        </button>
+                      </div>
+
+                      {authMessage && (
+                        <p className={`text-xs ${authMessage.startsWith('Hata') || authMessage.includes('Hatası') ? 'text-rose-400' : 'text-lime-400'}`}>
+                          {authMessage}
+                        </p>
+                      )}
+                    </form>
+                  </div>
                 )}
               </div>
             </div>
