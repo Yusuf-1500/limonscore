@@ -24,12 +24,9 @@ export async function GET(request: Request) {
 
   try {
     if (section === 'squad') {
-      const [squadJson, coachJson] = await Promise.all([
-        fetchApiFootball(`/players/squads?team=${id}`, 21600),
-        fetchApiFootball(`/coachs?team=${id}`, 21600),
-      ]);
-
+      const squadJson = await fetchApiFootball(`/players/squads?team=${id}`, 21600);
       let players = squadJson?.response?.[0]?.players || [];
+
       if (!players.length) {
         const pJson = await fetchApiFootball(`/players?team=${id}&season=${season}`, 21600);
         players = (pJson?.response || []).map((item: any) => ({
@@ -42,6 +39,7 @@ export async function GET(request: Request) {
         }));
       }
 
+      const coachJson = await fetchApiFootball(`/coachs?team=${id}`, 21600);
       return NextResponse.json({
         players,
         coach: coachJson?.response?.[0] || null,
@@ -49,6 +47,7 @@ export async function GET(request: Request) {
     }
 
     if (section === 'standings') {
+      // Önce güncel sezonu dener (Pro planda direkt 2026/27 döner), boşsa önceki sezona bakar
       let json = await fetchApiFootball(`/standings?team=${id}&season=${season}`, 21600);
       if (!json?.response?.length) {
         json = await fetchApiFootball(`/standings?team=${id}&season=${season - 1}`, 21600);
@@ -58,20 +57,21 @@ export async function GET(request: Request) {
     }
 
     if (section === 'fixtures') {
+      // 1. Önce API'den güncel sezon fikstürünü dene (Pro planda tüm sezon fikstürü gelir)
+      const apiJson = await fetchApiFootball(`/fixtures?team=${id}&season=${season}`, 3600);
+      const apiFixtures = apiJson?.response || [];
+      if (apiFixtures.length > 0) {
+        return NextResponse.json({ fixtures: apiFixtures });
+      }
+
+      // 2. API boş dönerse kendi Supabase veritabanımızdaki maçları getir
       const teamVariants = [`t-${id}`, id];
       const { data: dbMatches } = await supabaseAdmin
         .from('matches')
         .select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*), league:leagues(*)')
         .or(`home_team_id.in.(${teamVariants.join(',')}),away_team_id.in.(${teamVariants.join(',')})`)
         .order('fixture_date', { ascending: false })
-        .limit(20);
-
-      const apiJson = await fetchApiFootball(`/fixtures?team=${id}&season=${season}`, 3600);
-      const apiFixtures = apiJson?.response || [];
-
-      if (apiFixtures.length > 0) {
-        return NextResponse.json({ fixtures: apiFixtures });
-      }
+        .limit(30);
 
       const mapped = (dbMatches || []).map((m: any) => ({
         fixture: {
