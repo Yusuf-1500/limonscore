@@ -161,9 +161,9 @@ export async function GET(request: Request) {
         };
       });
 
-    const events = fixture.events ?? [];
-    const lineups = fixture.lineups ?? [];
-    const players = fixture.players ?? [];
+    const events = (fixture.events && fixture.events.length > 0) ? fixture.events : (cachedRow?.events ?? []);
+    const lineups = (fixture.lineups && fixture.lineups.length > 0) ? fixture.lineups : (cachedRow?.lineups ?? []);
+    const players = (fixture.players && fixture.players.length > 0) ? fixture.players : (cachedRow?.players ?? []);
     const matchStatus = fixture.fixture?.status?.short ?? 'NS';
 
     await supabaseAdmin.from('match_details_cache').upsert({
