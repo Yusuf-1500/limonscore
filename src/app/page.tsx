@@ -1,4 +1,7 @@
 'use client';
+import Link from 'next/link';
+import { GlobalSearchResults } from '@/components/GlobalSearchResults';
+
 import { AdBanner } from '@/components/AdBanner';
 import { useLanguage, LangSetting } from '@/context/LanguageContext';
 
@@ -1046,6 +1049,8 @@ export default function LimonScoreDashboard() {
                 )}
               </div>
 
+              <GlobalSearchResults query={searchQuery} />
+
               {!searchQuery && popularLeagues.length > 0 && (
                 <div>
                   <h3 className="text-xs font-bold text-slate-400 mb-2.5">En Popüler Müsabakalar</h3>
@@ -1401,11 +1406,18 @@ export default function LimonScoreDashboard() {
                               <div className="flex-1 min-w-0 space-y-1.5 border-l border-slate-800 pl-3">
                                 <div className="flex items-center gap-2">
                                   {match.home_team?.logo_url && (
-                                    <img
-                                      src={match.home_team.logo_url}
-                                      alt={match.home_team.name}
-                                      className="w-4 h-4 object-contain shrink-0"
-                                    />
+                                    <Link
+                                      href={`/takim/${match.home_team_id}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      title="Takim profilini ac"
+                                      className="shrink-0 hover:scale-110 transition"
+                                    >
+                                      <img
+                                        src={match.home_team.logo_url}
+                                        alt={match.home_team.name}
+                                        className="w-4 h-4 object-contain"
+                                      />
+                                    </Link>
                                   )}
                                   <span className="text-xs font-semibold truncate text-slate-100">
                                     {match.home_team?.name}
@@ -1416,11 +1428,18 @@ export default function LimonScoreDashboard() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {match.away_team?.logo_url && (
-                                    <img
-                                      src={match.away_team.logo_url}
-                                      alt={match.away_team.name}
-                                      className="w-4 h-4 object-contain shrink-0"
-                                    />
+                                    <Link
+                                      href={`/takim/${match.away_team_id}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      title="Takim profilini ac"
+                                      className="shrink-0 hover:scale-110 transition"
+                                    >
+                                      <img
+                                        src={match.away_team.logo_url}
+                                        alt={match.away_team.name}
+                                        className="w-4 h-4 object-contain"
+                                      />
+                                    </Link>
                                   )}
                                   <span className="text-xs font-semibold truncate text-slate-100">
                                     {match.away_team?.name}

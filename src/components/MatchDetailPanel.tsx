@@ -185,11 +185,13 @@ export function MatchDetailPanel({
                 <Star className={`w-4 h-4 ${isHomeFav ? 'fill-amber-400 text-amber-400' : ''}`} />
               </button>
               {match.home_team?.logo_url && (
-                <img
-                  src={match.home_team.logo_url}
-                  alt={match.home_team.name}
-                  className="w-11 h-11 object-contain"
-                />
+                <Link href={`/takim/${match.home_team_id}`} title="Takim sayfasina git" className="hover:scale-105 transition">
+                  <img
+                    src={match.home_team.logo_url}
+                    alt={match.home_team.name}
+                    className="w-11 h-11 object-contain"
+                  />
+                </Link>
               )}
             </div>
             <span className="text-xs font-bold text-slate-100 line-clamp-2">
@@ -231,11 +233,13 @@ export function MatchDetailPanel({
           <div className="flex flex-col items-center gap-1.5">
             <div className="flex items-center justify-center gap-2">
               {match.away_team?.logo_url && (
-                <img
-                  src={match.away_team.logo_url}
-                  alt={match.away_team.name}
-                  className="w-11 h-11 object-contain"
-                />
+                <Link href={`/takim/${match.away_team_id}`} title="Takim sayfasina git" className="hover:scale-105 transition">
+                  <img
+                    src={match.away_team.logo_url}
+                    alt={match.away_team.name}
+                    className="w-11 h-11 object-contain"
+                  />
+                </Link>
               )}
               <button
                 onClick={() => onToggleFavoriteTeam(match.away_team_id)}
