@@ -1,36 +1,25 @@
-import Link from "next/link";
+import Link from 'next/link';
+import { fetchApiFootball } from '@/lib/apiFootball';
 
-async function getLeagueData(leagueId: string) {
-  const apiKey = process.env.API_FOOTBALL_KEY || process.env.NEXT_PUBLIC_API_FOOTBALL_KEY || "";
-  const headers = { "x-apisports-key": apiKey };
-  const year = new Date().getFullYear();
-
-  let res = await fetch(`https://v3.football.api-sports.io/standings?league=${leagueId}&season=${year}`, {
-    headers,
-    next: { revalidate: 21600 },
-  });
-  let json = await res.json();
-
-  if (!json.response?.length) {
-    res = await fetch(`https://v3.football.api-sports.io/standings?league=${leagueId}&season=${year - 1}`, {
-      headers,
-      next: { revalidate: 21600 },
-    });
-    json = await res.json();
-  }
-
-  return json.response?.[0]?.league || null;
-}
+export const runtime = 'edge';
 
 export default async function LeaguePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const league = await getLeagueData(id);
+  const cleanId = id.replace(/^l-/, '');
+  const year = new Date().getFullYear();
+
+  let json = await fetchApiFootball(`/standings?league=${cleanId}&season=${year}`, 21600);
+  if (!json?.response?.length) {
+    json = await fetchApiFootball(`/standings?league=${cleanId}&season=${year - 1}`, 21600);
+  }
+
+  const league = json?.response?.[0]?.league || null;
 
   if (!league) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col items-center justify-center gap-3">
-        <p>Lig puan durumu bulunamadi.</p>
-        <Link href="/" className="text-xs text-lime-400 hover:underline">&larr; Ana Sayfaya Don</Link>
+        <p>Lig puan durumu bulunamadı.</p>
+        <Link href="/" className="text-xs text-lime-400 hover:underline">&larr; Ana Sayfaya Dön</Link>
       </div>
     );
   }
@@ -39,7 +28,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 max-w-5xl mx-auto space-y-6">
-      <Link href="/" className="text-xs text-lime-400 hover:underline">&larr; Ana Sayfaya Don</Link>
+      <Link href="/" className="text-xs text-lime-400 hover:underline">&larr; Ana Sayfaya Dön</Link>
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center gap-5">
         {league.logo && <img src={league.logo} alt={league.name} className="w-16 h-16 object-contain" />}
         <div>
@@ -55,7 +44,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ id: str
               <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
                 <tr>
                   <th className="py-3 px-3 w-10">#</th>
-                  <th className="py-3 px-3">Takim</th>
+                  <th className="py-3 px-3">Takım</th>
                   <th className="py-3 px-2 text-center">O</th>
                   <th className="py-3 px-2 text-center">G</th>
                   <th className="py-3 px-2 text-center">B</th>
