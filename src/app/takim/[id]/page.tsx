@@ -5,6 +5,28 @@ import { TeamHubClient } from '@/components/TeamHubClient';
 
 export const runtime = 'edge';
 
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const cleanId = id.replace(/^t-/, '');
+  const { data } = await supabaseAdmin
+    .from('teams')
+    .select('name, country')
+    .in('id', [id, `t-${cleanId}`, cleanId])
+    .maybeSingle();
+
+  const teamName = data?.name || 'Takım Detayları';
+  return {
+    title: `${teamName} Canlı Skorlar, Fikstür, Puan Durumu ve Kadro | LimonScore`,
+    description: `${teamName} canlı maç sonuçları, gelecek fikstürü, güncel puan durumu ve oyuncu kadrosu LimonScore'da.`,
+    alternates: {
+      canonical: `https://limonscore.com/takim/t-${cleanId}`,
+    },
+  };
+}
+
+
 export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const cleanId = id.replace(/^t-/, '');
